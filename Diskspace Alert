@@ -1,0 +1,9 @@
+let Lfs = dynamic(['"/"', '"/boot"', '"/Oracle"', '"/Var"', '"C:"','"D:"']);
+InsightsMetrics
+| where TimeGenerated > ago(15m) 
+| where Namespace has "LogicalDisk"
+    and Name has "FreeSpacePercentage"
+    and Val < 5
+    and Tags has_any(Lfs)
+| project Computer, _ResourceId, Tags, Val, TimeGenerated
+| summarize arg_max(TimeGenerated, *) by Computer
