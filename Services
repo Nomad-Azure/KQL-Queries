@@ -1,0 +1,8 @@
+let Lsvs = dynamic(["elasticsearch", "kibana"]);
+ConfigurationData
+| where TimeGenerated > ago(5m) 
+| where ConfigDataType has "Daemons" and 
+    SvcName has_any (Lsvs) and 
+    SvcState has "stopped" 
+| project Computer, SvcName, SvcState, TimeGenerated, _ResourceId
+| summarize arg_max(TimeGenerated, *) by Computer, _ResourceId
