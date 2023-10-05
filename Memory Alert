@@ -1,0 +1,6 @@
+InsightsMetrics
+| where Namespace == "Memory" and Name == "AvailableMB"
+| extend TotalMemory = toreal(todynamic(Tags)["vm.azm.ms/memorySizeMB"])
+| extend AvailableMemoryPercentage = (toreal(Val) / TotalMemory) * 100.0
+| summarize AggregatedValue = avg(AvailableMemoryPercentage) by bin(TimeGenerated, 15m), Computer, TotalMemory,AvailableMemoryPercentage, _ResourceId
+| project Computer, AggregatedValue, TimeGenerated, _ResourceId
